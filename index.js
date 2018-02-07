@@ -76,19 +76,24 @@
     }
   }
 
-  function onPickerMouseLeave(e) {
+  function onPickerMouseLeave(e, cb) {
     var picker = e.data;
     picker.picker.find('.day').removeClass('active range range-start selected');
     picker.fill();
+    if (typeof cb === 'function') cb();
   }
 
-  $.fn.datepickerMouseover = function() {
+  $.fn.datepickerMouseover = function(options) {
+    var mouseleaveCb = options.mouseleaveCb;
+
     var datepicker = this.data('datepicker');
     for (var i = 0; i < datepicker.pickers.length; i++) {
       var picker = datepicker.pickers[i];
       picker.picker.on('mouseenter', '.day', {picker: picker, index: i}, onPickerMouseEnter);
-      picker.picker.on('mouseleave', 'tbody', picker, onPickerMouseLeave);
+      picker.picker.on('mouseleave', 'tbody', picker, function(e) {
+        onPickerMouseLeave(e, mouseleaveCb);
+      });
       this.on('hide', picker, onPickerMouseLeave);
     }
-  };
+  }
 })(jQuery);
